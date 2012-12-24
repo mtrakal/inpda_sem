@@ -1,0 +1,2 @@
+# Module cz.mtrakal.inpda_sem.widgetset.Inpda_semWidgetset
+# RPC service class, partial path of RPC policy file
