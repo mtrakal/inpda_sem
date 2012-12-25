@@ -88,14 +88,16 @@ public class FilmotekaView extends VerticalLayout implements Property.ValueChang
 	public void valueChange(ValueChangeEvent event) {
 		Property property = event.getProperty();
 		if (property == table) {
-			lo.removeComponent(modalEdit);
-			lo.removeComponent(smazButton);
-			selectedItem = table.getItem(table.getValue());
-			modalEdit = new FilmotekaModal("Upravit film", "../runo/icons/16/document-web.png", selectedItem,
-					"Otevře okno pro úpravu filmu");
-			modalEdit.setImmediate(true);
-			lo.addComponent(modalEdit);
-			lo.addComponent(smazButton = smazButton());
+			if (app.getUzivatel().getPrava() == 1) {
+				lo.removeComponent(modalEdit);
+				lo.removeComponent(smazButton);
+				selectedItem = table.getItem(table.getValue());
+				modalEdit = new FilmotekaModal("Upravit film", "../runo/icons/16/document-web.png", selectedItem,
+						"Otevře okno pro úpravu filmu");
+				modalEdit.setImmediate(true);
+				lo.addComponent(modalEdit);
+				lo.addComponent(smazButton = smazButton());
+			}
 		}
 	}
 
@@ -174,7 +176,7 @@ public class FilmotekaView extends VerticalLayout implements Property.ValueChang
 			e.printStackTrace();
 		}
 
-		 final double totalFinal = total;
+		final double totalFinal = total;
 		graf.setChartWidth(450d);
 		graf.setChartHeight(300d);
 
@@ -190,7 +192,7 @@ public class FilmotekaView extends VerticalLayout implements Property.ValueChang
 		graf.setLegendAreaWidth(150d);
 
 		graf.setTooltipEnabled(true);
-		graf.setCaption("Počet filmů v dané kvalitě");		
+		graf.setCaption("Počet filmů v dané kvalitě");
 
 		graf.setLabelVisible(true);
 		PieLabelFormatter labelFormatter = new PieLabelFormatter() {

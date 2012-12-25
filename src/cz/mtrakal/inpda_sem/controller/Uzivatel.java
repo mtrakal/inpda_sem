@@ -13,13 +13,23 @@ public class Uzivatel {
 	Integer uzivatelId;
 	String email;
 	String heslo;
+	Integer prava;
 	Boolean updated = false;
 	
-	public Uzivatel(Integer idUzivatele, String email, String heslo) {
+	public Uzivatel(Integer idUzivatele, String email, String heslo, Integer prava) {
 		super();
 		this.uzivatelId = idUzivatele;
 		this.email = email;
 		this.heslo = heslo;
+		this.prava = prava;
+	}
+
+	public Integer getPrava() {
+		return prava;
+	}
+
+	public void setPrava(Integer prava) {
+		this.prava = prava;
 	}
 
 	public Uzivatel() {

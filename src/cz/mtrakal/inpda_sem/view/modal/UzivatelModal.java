@@ -55,7 +55,7 @@ public class UzivatelModal extends VerticalLayout {
 			// Editace prvku
 			novyPrvek = false;
 			this.prvek = new Uzivatel((Integer) prvek.getItemProperty("Uživatel ID").getValue(), (String) prvek.getItemProperty("Email")
-					.getValue(), (String) prvek.getItemProperty("Heslo").getValue());
+					.getValue(), (String) prvek.getItemProperty("Heslo").getValue(), (Integer) prvek.getItemProperty("Práva").getValue());
 		}
 		BeanItem<Uzivatel> pojoItem = new BeanItem<Uzivatel>(this.prvek);
 		subwindow = new Window((novyPrvek ? "Přidání" : "Editace") + " uživatele");
@@ -74,7 +74,7 @@ public class UzivatelModal extends VerticalLayout {
 		form.setItemDataSource(pojoItem); // bind to POJO via BeanItem
 
 		// Determines which properties are shown, and in which order:
-		form.setVisibleItemProperties(Arrays.asList(new String[] { "uzivatelId", "email", "heslo" }));
+		form.setVisibleItemProperties(Arrays.asList(new String[] { "uzivatelId", "email", "heslo", "prava" }));
 
 		// pridejPrvky(form);
 		layout.addComponent(form);
@@ -188,6 +188,13 @@ public class UzivatelModal extends VerticalLayout {
 				tf.setNullRepresentation("");
 				tf.setRequired(true);
 				tf.setRequiredError("Vyplň heslo");
+				// tf.setNullSettingAllowed(true);
+				tf.setWidth("12em");
+			} else if ("prava".equals(propertyId)) {
+				TextField tf = (TextField) f;
+				tf.setNullRepresentation("");
+				tf.setRequired(true);
+				tf.setRequiredError("Vyplň práva");
 				// tf.setNullSettingAllowed(true);
 				tf.setWidth("12em");
 			}

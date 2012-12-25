@@ -17,7 +17,7 @@ public class UzivateleModel {
 	}
 
 	public List<Uzivatel> getUzivatele() throws SQLException {
-		String query = "select uzivatel_id, email, heslo from uzivatele";
+		String query = "select uzivatel_id, email, heslo, prava from uzivatele";
 		if (conn == null) {
 			throw new SQLException("Chyba spojení");
 		}
@@ -26,13 +26,13 @@ public class UzivateleModel {
 		List<Uzivatel> uzivatele = new ArrayList<Uzivatel>();
 
 		while (rset.next()) {
-			uzivatele.add(new Uzivatel(rset.getInt(1), rset.getString(2), rset.getString(3)));
+			uzivatele.add(new Uzivatel(rset.getInt(1), rset.getString(2), rset.getString(3), rset.getInt(4)));
 		}
 		return uzivatele;
 	}
 
 	public List<Uzivatel> getUzivatele(String email, String heslo) throws SQLException {
-		String query = "select uzivatel_id, email, heslo from uzivatele where email='" + email + "' and heslo='" + heslo + "'";
+		String query = "select uzivatel_id, email, heslo, prava from uzivatele where email='" + email + "' and heslo='" + heslo + "'";
 		if (conn == null) {
 			throw new SQLException("Chyba spojení");
 		}
@@ -41,7 +41,7 @@ public class UzivateleModel {
 		List<Uzivatel> uzivatele = new ArrayList<Uzivatel>();
 
 		while (rset.next()) {
-			uzivatele.add(new Uzivatel(rset.getInt(1), rset.getString(2), rset.getString(3)));
+			uzivatele.add(new Uzivatel(rset.getInt(1), rset.getString(2), rset.getString(3), rset.getInt(4)));
 		}
 		stmt.close();
 		return uzivatele;
@@ -55,15 +55,15 @@ public class UzivateleModel {
 	}
 
 	public void update(Uzivatel uzivatel) throws SQLException {
-		String query = "update uzivatele set email='" + uzivatel.getEmail() + "', heslo='" + uzivatel.getHeslo() + "' where uzivatel_id='"
-				+ uzivatel.getUzivatelId() + "'";
+		String query = "update uzivatele set email='" + uzivatel.getEmail() + "', heslo='" + uzivatel.getHeslo() + "', prava="
+				+ uzivatel.getPrava() + " where uzivatel_id='" + uzivatel.getUzivatelId() + "'";
 		Statement stmt = conn.createStatement();
 		stmt.executeQuery(query);
 	}
 
 	public void insert(Uzivatel uzivatel) throws SQLException {
-		String query = "insert into uzivatele (uzivatel_id, email, heslo) values (" + uzivatel.getUzivatelId() + ", '"
-				+ uzivatel.getEmail() + "', '" + uzivatel.getHeslo() + "')";
+		String query = "insert into uzivatele (uzivatel_id, email, heslo, prava) values (" + uzivatel.getUzivatelId() + ", '"
+				+ uzivatel.getEmail() + "', '" + uzivatel.getHeslo() + "', prava=" + uzivatel.getPrava() + ")";
 		Statement stmt = conn.createStatement();
 		stmt.executeQuery(query);
 	}

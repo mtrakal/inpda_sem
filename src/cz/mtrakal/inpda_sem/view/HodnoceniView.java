@@ -14,13 +14,18 @@ import com.bibounde.vprotovis.chart.pie.PieLabelFormatter;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.ThemeResource;
+import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.AbstractSelect.Filtering;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.InlineDateField;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.PopupDateField;
+import com.vaadin.ui.Select;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Button.ClickEvent;
@@ -97,20 +102,22 @@ public class HodnoceniView extends VerticalLayout implements Property.ValueChang
 	public void valueChange(ValueChangeEvent event) {
 		Property property = event.getProperty();
 		if (property == table) {
-			lo.removeComponent(modalEdit);
-			lo.removeComponent(smazButton);
-			selectedItem = table.getItem(table.getValue());
-			try {
-				modalEdit = new HodnoceniModal("Upravit hodnocení", "../runo/icons/16/document-web.png", selectedItem,
-						"Otevře okno pro úpravu uživatele");
-			} catch (ParseException e) {
-				app.getMainWindow().showNotification("Nepovedlo se naformátovat datum", "<br/>" + e.getMessage(),
-						Notification.TYPE_ERROR_MESSAGE);
-				e.printStackTrace();
+			if (app.getUzivatel().getPrava() == 1) {
+				lo.removeComponent(modalEdit);
+				lo.removeComponent(smazButton);
+				selectedItem = table.getItem(table.getValue());
+				try {
+					modalEdit = new HodnoceniModal("Upravit hodnocení", "../runo/icons/16/document-web.png", selectedItem,
+							"Otevře okno pro úpravu uživatele");
+				} catch (ParseException e) {
+					app.getMainWindow().showNotification("Nepovedlo se naformátovat datum", "<br/>" + e.getMessage(),
+							Notification.TYPE_ERROR_MESSAGE);
+					e.printStackTrace();
+				}
+				modalEdit.setImmediate(true);
+				lo.addComponent(modalEdit);
+				lo.addComponent(smazButton = smazButton());
 			}
-			modalEdit.setImmediate(true);
-			lo.addComponent(modalEdit);
-			lo.addComponent(smazButton = smazButton());
 		}
 	}
 
@@ -230,8 +237,8 @@ public class HodnoceniView extends VerticalLayout implements Property.ValueChang
 		graf.setMarginRight(40d);
 
 		graf.setMarginBottom(40d);
-		graf.setCaption("Hodnocení filmů v procentech");		
-		
+		graf.setCaption("Hodnocení filmů v procentech");
+
 		graf.setLegendVisible(true);
 		graf.setLegendAreaWidth(150d);
 

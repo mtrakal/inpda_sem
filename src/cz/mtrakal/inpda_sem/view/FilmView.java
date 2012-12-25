@@ -75,13 +75,15 @@ public class FilmView extends VerticalLayout implements Property.ValueChangeList
 	public void valueChange(ValueChangeEvent event) {
 		Property property = event.getProperty();
 		if (property == table) {
-			lo.removeComponent(modalEdit);
-			lo.removeComponent(smazButton);
-			selectedItem = table.getItem(table.getValue());
-			modalEdit = new FilmModal("Upravit film", "../runo/icons/16/document-web.png", selectedItem, "Otevře okno pro úpravu filmu");
-			modalEdit.setImmediate(true);
-			lo.addComponent(modalEdit);
-			lo.addComponent(smazButton = smazButton());
+			if (app.getUzivatel().getPrava() == 1) {
+				lo.removeComponent(modalEdit);
+				lo.removeComponent(smazButton);
+				selectedItem = table.getItem(table.getValue());
+				modalEdit = new FilmModal("Upravit film", "../runo/icons/16/document-web.png", selectedItem, "Otevře okno pro úpravu filmu");
+				modalEdit.setImmediate(true);
+				lo.addComponent(modalEdit);
+				lo.addComponent(smazButton = smazButton());
+			}
 		}
 	}
 
@@ -142,7 +144,7 @@ public class FilmView extends VerticalLayout implements Property.ValueChangeList
 		});
 		return b;
 	}
-	
+
 	@Override
 	public void buttonClick(ClickEvent event) {
 		// TODO Auto-generated method stub

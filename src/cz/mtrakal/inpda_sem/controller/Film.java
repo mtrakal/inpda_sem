@@ -1,6 +1,7 @@
 package cz.mtrakal.inpda_sem.controller;
 
 import java.sql.SQLException;
+import java.util.Collection;
 
 import cz.mtrakal.inpda_sem.model.FilmModel;
 
@@ -108,5 +109,9 @@ public class Film {
 	public static void deleteFromDB(Integer filmId) throws SQLException {
 		FilmModel model = new FilmModel();
 		model.delete(filmId);
+	}
+	@Override
+	public String toString() {
+		return getNazevCz();
 	}
 }

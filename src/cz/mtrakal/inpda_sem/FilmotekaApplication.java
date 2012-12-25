@@ -45,6 +45,11 @@ public class FilmotekaApplication extends Application implements ClickListener, 
 	Window mainWindow;
 	VerticalLayout layout;
 	String otevreneOkno;
+	Uzivatel uzivatel = null;
+
+	public Uzivatel getUzivatel() {
+		return this.uzivatel;
+	}
 
 	@Override
 	public void init() {
@@ -53,7 +58,8 @@ public class FilmotekaApplication extends Application implements ClickListener, 
 			getContext().addTransactionListener(this);
 		}
 		// FIXME: do finální verze to přepsat...
-//		buildMainLayout();
+		// buildMainLayout();
+		setTheme("inpda_semtheme");
 		setMainWindow(new LoginWindow());
 	}
 
@@ -67,6 +73,7 @@ public class FilmotekaApplication extends Application implements ClickListener, 
 		}
 
 		if (uzivatele.get(0).getEmail().equals(email) && uzivatele.get(0).getHeslo().equals(heslo)) {
+			uzivatel = uzivatele.get(0);
 			buildMainLayout();
 			return;
 		}
@@ -148,17 +155,19 @@ public class FilmotekaApplication extends Application implements ClickListener, 
 		});
 		retVal.addComponent(hodnoceniButton);
 
-		Button uzivateleButton = new Button("Uživatelé");
-		uzivateleButton.setWidth(200, Button.UNITS_PIXELS);
-		uzivateleButton.setImmediate(true);
-		uzivateleButton.addListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent event) {
-				horizontalSplit.setSecondComponent(new UzivateleView());
-				otevreneOkno = "uzivatele";
-			}
-		});
-		retVal.addComponent(uzivateleButton);
+		if (uzivatel.getPrava() == 1) {
+			Button uzivateleButton = new Button("Uživatelé");
+			uzivateleButton.setWidth(200, Button.UNITS_PIXELS);
+			uzivateleButton.setImmediate(true);
+			uzivateleButton.addListener(new Button.ClickListener() {
+				@Override
+				public void buttonClick(Button.ClickEvent event) {
+					horizontalSplit.setSecondComponent(new UzivateleView());
+					otevreneOkno = "uzivatele";
+				}
+			});
+			retVal.addComponent(uzivateleButton);
+		}
 
 		Button kvalitaButton = new Button("Kvalita filmů");
 		kvalitaButton.setWidth(200, Button.UNITS_PIXELS);
@@ -172,7 +181,7 @@ public class FilmotekaApplication extends Application implements ClickListener, 
 		});
 		retVal.addComponent(kvalitaButton);
 
-		Button odhlasitButton = new Button("Odhlásit");
+		Button odhlasitButton = new Button("Odhlásit" + (uzivatel != null ? " " + uzivatel.getEmail() : ""));
 		odhlasitButton.setWidth(200, Button.UNITS_PIXELS);
 		odhlasitButton.setImmediate(true);
 		odhlasitButton.addListener(new Button.ClickListener() {

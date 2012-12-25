@@ -6,10 +6,12 @@ import com.vaadin.terminal.ExternalResource;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 
+/**
+ * @author Matěj Trakal
+ * 
+ */
 public class LoginWindow extends Window {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 4184911870351139566L;
 	private final VerticalLayout layout = new VerticalLayout();
 	private final Button btnLogin = new Button("Příhlásit se");

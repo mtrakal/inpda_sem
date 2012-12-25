@@ -34,9 +34,6 @@ public class Hodnoceni {
 	}
 
 	public void setFilmId(Integer filmId) {
-		if (this.filmId != filmId && this.filmId != null) {
-			updated = true;
-		}
 		this.filmId = filmId;
 	}
 
@@ -56,6 +53,9 @@ public class Hodnoceni {
 	}
 
 	public void setHvezdy(Integer hvezdy) {
+		if (this.hvezdy != hvezdy && this.hvezdy != null) {
+			updated = true;
+		}
 		this.hvezdy = hvezdy;
 	}
 
@@ -64,6 +64,9 @@ public class Hodnoceni {
 	}
 
 	public void setPopis(String popis) {
+		if (this.popis != popis && this.popis != null) {
+			updated = true;
+		}
 		this.popis = popis;
 	}
 

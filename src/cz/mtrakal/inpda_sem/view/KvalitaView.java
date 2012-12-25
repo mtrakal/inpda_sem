@@ -78,20 +78,24 @@ public class KvalitaView extends VerticalLayout implements Property.ValueChangeL
 	public void valueChange(ValueChangeEvent event) {
 		Property property = event.getProperty();
 		if (property == table) {
-			lo.removeComponent(modalEdit);
-			lo.removeComponent(smazButton);
-			selectedItem = table.getItem(table.getValue());
-			modalEdit = new KvalitaModal("Upravit kvalitu filmu", "../runo/icons/16/document-web.png", selectedItem,
-					"Otevře okno pro přidání nového přepravce");
-			modalEdit.setImmediate(true);
-			lo.addComponent(modalEdit);
-			lo.addComponent(smazButton = smazButton());
+			if (app.getUzivatel().getPrava() == 1) {
+				lo.removeComponent(modalEdit);
+				lo.removeComponent(smazButton);
+				selectedItem = table.getItem(table.getValue());
+				modalEdit = new KvalitaModal("Upravit kvalitu filmu", "../runo/icons/16/document-web.png", selectedItem,
+						"Otevře okno pro přidání nového přepravce");
+				modalEdit.setImmediate(true);
+				lo.addComponent(modalEdit);
+				lo.addComponent(smazButton = smazButton());
+			}
 		}
 	}
 
 	private HorizontalLayout createToolbar() {
 		lo = new HorizontalLayout();
-		lo.addComponent(modalNew);
+		if (app.getUzivatel().getPrava() == 1) {
+			lo.addComponent(modalNew);
+		}
 		// lo.addComponent(modalEdit);
 		lo.setMargin(true);
 		lo.setSpacing(true);
@@ -143,14 +147,14 @@ public class KvalitaView extends VerticalLayout implements Property.ValueChangeL
 
 	private PieChartComponent kresliGraf() {
 		PieChartComponent graf = new PieChartComponent();
-//		double total = 0;
-		
+		// double total = 0;
+
 		Map<String, Float> grafMapa;
 		try {
 			grafMapa = new KvalitaModel().getProcentaKvalita();
 			for (Map.Entry<String, Float> item : grafMapa.entrySet()) {
 				graf.addSerie(item.getKey(), item.getValue(), false);
-//				total += item.getValue();
+				// total += item.getValue();
 			}
 
 		} catch (SQLException e) {
@@ -158,7 +162,7 @@ public class KvalitaView extends VerticalLayout implements Property.ValueChangeL
 			e.printStackTrace();
 		}
 
-//		final double totalFinal = total;
+		// final double totalFinal = total;
 		final double totalFinal = 100;
 		graf.setChartWidth(450d);
 		graf.setChartHeight(300d);
@@ -176,7 +180,7 @@ public class KvalitaView extends VerticalLayout implements Property.ValueChangeL
 
 		graf.setTooltipEnabled(true);
 		graf.setCaption("Filmy v danné kvalitě v procentech");
-		
+
 		graf.setLabelVisible(true);
 		PieLabelFormatter labelFormatter = new PieLabelFormatter() {
 			private static final long serialVersionUID = 1L;

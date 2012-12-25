@@ -3,13 +3,19 @@ package cz.mtrakal.inpda_sem.view.modal;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.AbstractSelect.Filtering;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DefaultFieldFactory;
@@ -17,6 +23,7 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Link;
+import com.vaadin.ui.Select;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -24,18 +31,28 @@ import com.vaadin.ui.Window.Notification;
 
 import cz.mtrakal.inpda_sem.ApplicationHolder;
 import cz.mtrakal.inpda_sem.FilmotekaApplication;
+import cz.mtrakal.inpda_sem.controller.Film;
 import cz.mtrakal.inpda_sem.controller.Filmoteka;
+import cz.mtrakal.inpda_sem.controller.Kvalita;
+import cz.mtrakal.inpda_sem.model.FilmModel;
+import cz.mtrakal.inpda_sem.model.KvalitaModel;
 
 /**
  * @author Matěj Trakal
  * 
  */
-public class FilmotekaModal extends VerticalLayout {
+public class FilmotekaModal extends VerticalLayout implements Property.ValueChangeListener {
 
 	FilmotekaApplication app = ApplicationHolder.getApplication();
 	Window subwindow;
 	Boolean novyPrvek = true;
 	Filmoteka prvek;
+	Select selectFilmy;
+	Select selectKvalita;
+	List<Film> filmy = null;
+	List<Kvalita> kvalita = null;
+	Map<Integer, Film> mapaFilmy = new HashMap<Integer, Film>();
+	Map<Integer, Kvalita> mapaKvalita = new HashMap<Integer, Kvalita>();
 
 	public FilmotekaModal(String popisek, String ikona) {
 		this(popisek, ikona, null);
@@ -46,6 +63,21 @@ public class FilmotekaModal extends VerticalLayout {
 	}
 
 	public FilmotekaModal(String popisekTlacitka, String ikona, Item prvek, String tooltip) {
+		try {
+			filmy = new FilmModel().getFilmy();
+			kvalita = new KvalitaModel().getKvalita();
+			for (Film item : filmy) {
+				mapaFilmy.put(item.getFilmId(), item);
+			}
+			for (Kvalita item : kvalita) {
+				mapaKvalita.put(item.getKvalitaId(), item);
+			}
+		} catch (SQLException e) {
+			app.getMainWindow().showNotification("Nepovedlo se načíst záznam do databáze...", "<br/>" + e.getMessage(),
+					Notification.TYPE_ERROR_MESSAGE);
+			e.printStackTrace();
+		}
+
 		if (prvek == null) {
 			// nový prvek do DB
 			this.prvek = new Filmoteka();
@@ -73,7 +105,23 @@ public class FilmotekaModal extends VerticalLayout {
 		form.setItemDataSource(pojoItem); // bind to POJO via BeanItem
 
 		// Determines which properties are shown, and in which order:
-		form.setVisibleItemProperties(Arrays.asList(new String[] { "filmotekaId", "filmId", "umisteni", "kvalitaId" }));
+		form.setVisibleItemProperties(Arrays.asList(new String[] { "filmotekaId", "umisteni" }));
+
+		selectFilmy = getSelectFilmy();
+		selectFilmy.setValue(mapaFilmy.get(this.prvek.getFilmId()));
+		selectFilmy.setRequired(true);
+		if (!novyPrvek) {
+			// selectFilmy.setEnabled(false);
+		}
+		form.addField(selectFilmy, selectFilmy);
+
+		selectKvalita = getSelectKvalita();
+		selectKvalita.setValue(mapaKvalita.get(this.prvek.getKvalitaId()));
+		selectKvalita.setRequired(true);
+		if (!novyPrvek) {
+			// selectKvalita.setEnabled(false);
+		}
+		form.addField(selectKvalita, selectKvalita);
 
 		// pridejPrvky(form);
 		layout.addComponent(form);
@@ -93,12 +141,12 @@ public class FilmotekaModal extends VerticalLayout {
 				form.commit();
 				try {
 					ulozPrvek();
-					getWindow().showNotification("Ukládání proběhlo úspěšně.", Notification.TYPE_HUMANIZED_MESSAGE);
+					app.getMainWindow().showNotification("Ukládání proběhlo úspěšně.", Notification.TYPE_HUMANIZED_MESSAGE);
 					(subwindow.getParent()).removeWindow(subwindow);
 					app.windowClose(null);
 				} catch (SQLException e) {
 					// showPojoState();
-					getWindow().showNotification("Nepovedlo se uložit záznam do databáze", "<br/>" + e.getMessage(),
+					app.getMainWindow().showNotification("Nepovedlo se uložit záznam do databáze", "<br/>" + e.getMessage(),
 							Notification.TYPE_ERROR_MESSAGE);
 					e.printStackTrace();
 				}
@@ -107,7 +155,7 @@ public class FilmotekaModal extends VerticalLayout {
 		save.setIcon(new ThemeResource("../runo/icons/16/ok.png"));
 
 		HorizontalLayout hl = new HorizontalLayout();
-		hl.setWidth("220px");
+		hl.setWidth("300px");
 		hl.addComponent(cancel);
 		hl.setComponentAlignment(cancel, Alignment.BOTTOM_LEFT);
 		hl.addComponent(save);
@@ -140,6 +188,8 @@ public class FilmotekaModal extends VerticalLayout {
 	}
 
 	private void ulozPrvek() throws SQLException {
+		this.prvek.setFilmId(((Film) selectFilmy.getValue()).getFilmId());
+		this.prvek.setKvalitaId(((Kvalita) selectKvalita.getValue()).getKvalitaId());
 		prvek.storeToDB();
 	}
 
@@ -182,4 +232,49 @@ public class FilmotekaModal extends VerticalLayout {
 			return f;
 		}
 	}
+
+	private Select getSelectFilmy() {
+		Select l = null;
+		l = new Select("Film");
+		for (Film item : filmy) {
+			l.addItem(item);
+			l.setItemCaption(item, item.getNazevCz());
+		}
+
+		// Set the appropriate filtering mode for this example
+		l.setFilteringMode(Filtering.FILTERINGMODE_CONTAINS);
+		l.setImmediate(true);
+		l.addListener(this);
+
+		// Disallow null selections
+		l.setNullSelectionAllowed(false);
+
+		return l;
+	}
+
+	private Select getSelectKvalita() {
+		Select l = null;
+		l = new Select("Kvalita");
+		for (Kvalita item : kvalita) {
+			l.addItem(item);
+			l.setItemCaption(item, item.getKvalita());
+		}
+
+		// Set the appropriate filtering mode for this example
+		l.setFilteringMode(Filtering.FILTERINGMODE_CONTAINS);
+		l.setImmediate(true);
+		l.addListener(this);
+
+		// Disallow null selections
+		l.setNullSelectionAllowed(false);
+
+		return l;
+	}
+
+	@Override
+	public void valueChange(ValueChangeEvent event) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

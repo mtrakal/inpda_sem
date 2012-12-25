@@ -77,14 +77,16 @@ public class UzivateleView extends VerticalLayout implements Property.ValueChang
 	public void valueChange(ValueChangeEvent event) {
 		Property property = event.getProperty();
 		if (property == table) {
-			lo.removeComponent(modalEdit);
-			lo.removeComponent(smazButton);
-			selectedItem = table.getItem(table.getValue());
-			modalEdit = new UzivatelModal("Upravit uživatele", "../runo/icons/16/document-web.png", selectedItem,
-					"Otevře okno pro úpravu uživatele");
-			modalEdit.setImmediate(true);
-			lo.addComponent(modalEdit);
-			lo.addComponent(smazButton = smazButton());
+			if (app.getUzivatel().getPrava() == 1) {
+				lo.removeComponent(modalEdit);
+				lo.removeComponent(smazButton);
+				selectedItem = table.getItem(table.getValue());
+				modalEdit = new UzivatelModal("Upravit uživatele", "../runo/icons/16/document-web.png", selectedItem,
+						"Otevře okno pro úpravu uživatele");
+				modalEdit.setImmediate(true);
+				lo.addComponent(modalEdit);
+				lo.addComponent(smazButton = smazButton());
+			}
 		}
 	}
 
@@ -103,6 +105,7 @@ public class UzivateleView extends VerticalLayout implements Property.ValueChang
 		table.addContainerProperty("Uživatel ID", Integer.class, null);
 		table.addContainerProperty("Email", String.class, null);
 		table.addContainerProperty("Heslo", String.class, null);
+		table.addContainerProperty("Práva", Integer.class, null);
 
 		table.setColumnCollapsingAllowed(true);
 		table.setColumnReorderingAllowed(true);
@@ -112,7 +115,7 @@ public class UzivateleView extends VerticalLayout implements Property.ValueChang
 		table.addListener((Property.ValueChangeListener) this);
 
 		for (Uzivatel item : listPrvku) {
-			table.addItem(new Object[] { item.getUzivatelId(), item.getEmail(), item.getHeslo() }, item.getUzivatelId());
+			table.addItem(new Object[] { item.getUzivatelId(), item.getEmail(), item.getHeslo(), item.getPrava() }, item.getUzivatelId());
 		}
 		table.setPageLength(listPrvku.size());
 		addComponent(table);
